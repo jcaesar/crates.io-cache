@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+
+  indexupd:
+    image: liftm/cratesiocache:indexupdater
+    build:
+      context: .
+      dockerfile: repoup.Dockerfile
+      args:
+        http_proxy: ${http_proxy-}
+        https_proxy: ${https_proxy-}
+    environment:
+      http_proxy: ${http_proxy-}
+      https_proxy: ${https_proxy-}
+      CACHE_EXT_URL: ${CACHE_EXT_URL-http://localhost:38105}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 1h
+    volumes:
+      - repo:/mnt/repo
+
+  indexsrv:
+    image: clojure # Used for cratesrv and conveniently has git installed
+    entrypoint: git daemon --reuseaddr --export-all --base-path=/mnt/repo /mnt/repo
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+    ports:
+      - ${DEFAULT_GIT_PORT-9418}:9418
+    volumes:
+      - repo:/mnt/repo
+
+  cratesrv:
+    image: liftm/cratesiocache:cratecache
+    build:
+      context: .
+      dockerfile: cratecache.Dockerfile
+      args:
+        http_proxy: ${http_proxy-}
+        https_proxy: ${https_proxy-}
+    ports:
+      - ${CRATE_PROXY_PORT-38105}:38105
+    environment:
+      http_proxy: ${http_proxy-}
+      https_proxy: ${https_proxy-}
+      CRATE_PROXY_PORT: ${CRATE_PROXY_PORT-38105}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+    volumes:
+      - cache:/mnt/cache
+
+volumes:
+  repo:
+  cache:
+

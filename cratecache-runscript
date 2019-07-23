@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+mkdir -p ~/.proxychains
+if test -z ${PROXYCHAINS+x} && test -n ${http_proxy+x}; then
+	PROXYCHAINS="$(sed <<<"$http_proxy" -rn 's#(https?)://(((.*):(.*)@)?(.+)):([0-9]+)/?$#\1 \6 \7 \4 \5#p')"
+	if test -z ${PROXYCHAINS:+x}; then
+		echo "WARNING: http_proxy is set but PROXYCHAINS couldn't be configured" 1>&2
+	fi
+fi
+echo "
+strict_chain
+proxy_dns
+tcp_read_time_out 24000
+tcp_connect_time_out 15000
+[ProxyList]
+$PROXYCHAINS
+" >~/.proxychains/proxychains.conf
+
+export CACHE_ROOT=/mnt/cache/crates
+exec proxychains lein crate-proxy

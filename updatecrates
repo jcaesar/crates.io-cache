@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+#set -x
+
+while true; do
+
+	cd "/mnt/repo/crates.io-index"
+	branch="master"
+
+	git fetch origin
+	git reset --hard origin/master
+
+	echo '{
+	  "dl": "'"$CACHE_EXT_URL"'/api/v1/crates",
+	  "api": "'"$CACHE_EXT_URL"'"
+	}' | jq -c . >config.json
+	git commit -qam "Redirect to $CACHE_EXT_URL cache"
+
+	git push -fq "$PWD.git" master:master
+
+	cd "$PWD.git"
+	git update-server-info
+
+	sleep 6h
+done
