@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export CACHE_ROOT=/mnt/cache/crates
 
 mkdir -p ~/.proxychains
 if test -z ${PROXYCHAINS+x} && test -n ${http_proxy+x}; then
@@ -9,14 +10,17 @@ if test -z ${PROXYCHAINS+x} && test -n ${http_proxy+x}; then
 		echo "WARNING: http_proxy is set but PROXYCHAINS couldn't be configured" 1>&2
 	fi
 fi
-echo "
-strict_chain
-proxy_dns
-tcp_read_time_out 24000
-tcp_connect_time_out 15000
-[ProxyList]
-$PROXYCHAINS
-" >~/.proxychains/proxychains.conf
-
-export CACHE_ROOT=/mnt/cache/crates
-exec proxychains lein crate-proxy
+if test -n ${PROXYCHAINS:+x}; then
+	echo "
+		strict_chain
+		proxy_dns
+		tcp_read_time_out 24000
+		tcp_connect_time_out 15000
+		quiet_mode
+		[ProxyList]
+		$PROXYCHAINS
+	" >~/.proxychains/proxychains.conf
+	exec proxychains lein crate-proxy
+else
+	exec lein crate-proxy
+fi
