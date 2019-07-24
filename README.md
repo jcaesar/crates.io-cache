@@ -1,20 +1,21 @@
 # crates.io caching proxy
 
-A full blown caching proxy for both https://github.com/rust-lang/crates.io-index and https://crates.io/api/v1/crates.
+A caching proxy for both https://github.com/rust-lang/crates.io-index and https://crates.io/api/v1/crates.
 Based on [puppetlabs/crates-caching-proxy](https://github.com/puppetlabs/crates-caching-proxy).
 
-Several tests showed that downloading crates is somewhat flaky, especially when using `http_proxy`. Use at own disgression, or send PRs.
+Downloading crates is somewhat flaky, especially when using `http_proxy`. Use at own risk, send PRs.
 
 ## Usage
 ```bash
 docker-compose rm -vfs && docker-compose up --build # Sure, -d it, miss the error message. ;)
 ```
 Then, place
-```
+```toml
 [source]
 
 [source.localcrates]
 registry = "git://localhost/crates.io-index.git"
+# Does not need to be on localhost
 
 [source.crates-io]
 ```
