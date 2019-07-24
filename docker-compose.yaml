@@ -21,8 +21,13 @@ services:
       - repo:/mnt/repo
 
   indexsrv:
-    image: clojure # Used for cratesrv and conveniently has git installed
-    entrypoint: git daemon --reuseaddr --export-all --base-path=/mnt/repo /mnt/repo
+    image: liftm/cratesiocache:indexserver
+    build:
+      context: .
+      dockerfile: reposerve.Dockerfile
+      args:
+        http_proxy: ${http_proxy-}
+        https_proxy: ${https_proxy-}
     deploy:
       restart_policy:
         condition: on-failure
