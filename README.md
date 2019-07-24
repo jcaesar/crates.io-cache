@@ -3,7 +3,7 @@
 A caching proxy for both https://github.com/rust-lang/crates.io-index and https://crates.io/api/v1/crates.
 Based on [puppetlabs/crates-caching-proxy](https://github.com/puppetlabs/crates-caching-proxy).
 
-Downloading crates is somewhat flaky, especially when using `http_proxy`. Use at own risk, send PRs.
+Use at own risk, send PRs.
 
 ## Usage
 ```bash

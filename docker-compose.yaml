@@ -51,7 +51,7 @@ services:
         condition: on-failure
         delay: 10s
     volumes:
-      - cache:/mnt/cache
+      - cache:/mnt/crate-cache
 
 volumes:
   repo:

@@ -1,13 +1,17 @@
-FROM clojure
+FROM clojure as builder
 
-RUN apt update && apt -y install proxychains && rm -rf /var/*/apt /var/cache/dpkg
-
-RUN  useradd -c 'C2' -m -d /home/a -s /bin/bash -u 1333 a && mkdir -p /opt/ccp /mnt/cache/crates && chown -R a:a /opt/ccp /mnt/cache
-#USER a TODO
 WORKDIR /opt/ccp
 RUN git clone https://github.com/puppetlabs/crates-caching-proxy . \
-	&& lein deps && lein compile && lein uberjar # TODO: Would be nice to run that jar in a different stage. Or maybe we can replace it by nginx entirely?
+	&& lein deps && lein compile && lein uberjar \
+	&& mv target/crates-caching-proxy-*-standalone.jar ccp.jar
 
-VOLUME /mnt/cache
+FROM openjdk
+
+RUN curl http://springdale.math.ias.edu/data/puias/unsupported/7/x86_64//proxychains-ng-4.11-1.sdl7.x86_64.rpm -o pcng.rpm \
+	&& echo "24c7bd1a52a7751e1decc1bf23aa373dd7005713b6c74f34247036d25d811990  pcng.rpm" | sha256sum -c \
+	&& yum install -y pcng.rpm && rm -rf pcng.rpm
+
+VOLUME /mnt/crate-cache
+COPY --from=builder /opt/ccp/ccp.jar /opt/
 COPY cratecache-runscript /usr/local/bin/
 ENTRYPOINT ["cratecache-runscript"]

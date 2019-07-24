@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-export CACHE_ROOT=/mnt/cache/crates
+export CACHE_ROOT=/mnt/crate-cache
+mkdir -p "$CACHE_ROOT"
+
+# I wish this would cut it, but somewhere along the line, the proxy configuration is lost.
+#exec java -Djava.net.useSystemProxies=true -jar /opt/ccp.jar -m puppetlabs.crates-caching-proxy.core
 
 mkdir -p ~/.proxychains
 if test -z ${PROXYCHAINS+x} && test -n ${http_proxy+x}; then
@@ -19,8 +23,8 @@ if test -n ${PROXYCHAINS:+x}; then
 		quiet_mode
 		[ProxyList]
 		$PROXYCHAINS
-	" >~/.proxychains/proxychains.conf
-	exec proxychains lein crate-proxy
+	" | sed -r 's/^[ \t]*//' >~/.proxychains/proxychains.conf
+	exec proxychains4 java -jar /opt/ccp.jar -m puppetlabs.crates-caching-proxy.core
 else
-	exec lein crate-proxy
+	exec java -jar /opt/ccp.jar -m puppetlabs.crates-caching-proxy.core
 fi
