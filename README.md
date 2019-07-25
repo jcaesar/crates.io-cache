@@ -5,6 +5,9 @@ Based on [puppetlabs/crates-caching-proxy](https://github.com/puppetlabs/crates-
 
 Use at own risk, send PRs.
 
+Or better, just use [ChrisMacNaughton/cargo-cacher](https://github.com/ChrisMacNaughton/cargo-cacher/).
+(In case you don't require being able to reach the proxy over the network.)
+
 ## Usage
 ```bash
 docker-compose rm -vfs && docker-compose up --build # Sure, -d it, miss the error message. ;)
