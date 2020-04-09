@@ -1,12 +1,13 @@
+# Deprecated
+
+[ChrisMacNaughton/cargo-cacher](https://github.com/ChrisMacNaughton/cargo-cacher/) has picked up activity again and released a few fixes, this is unnecessary now.
+
 # crates.io caching proxy
 
 A caching proxy for both https://github.com/rust-lang/crates.io-index and https://crates.io/api/v1/crates.
 Based on [puppetlabs/crates-caching-proxy](https://github.com/puppetlabs/crates-caching-proxy).
 
 Use at own risk, send PRs.
-
-Or better, just use [ChrisMacNaughton/cargo-cacher](https://github.com/ChrisMacNaughton/cargo-cacher/).
-(In case you don't require being able to reach the proxy over the network.)
 
 ## Usage
 ```bash
